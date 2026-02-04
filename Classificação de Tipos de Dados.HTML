@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Classificação de Tipos de Dados</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+    text-align: center;
+}
+
+/* ITENS */
+#itens {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px;
+}
+
+.item {
+    width: 120px;
+    margin: 8px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: grab;
+    font-weight: bold;
+}
+
+.numero { background-color: #cce5ff; }
+.decimal { background-color: #cce5ff; }
+.texto { background-color: #cce5ff; }
+
+/* CAIXAS */
+.container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+
+.caixa {
+    width: 30%;
+    min-height: 260px;
+    border: 2px dashed #555;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #fff;
+}
+
+/* BOTÕES */
+.botoes {
+    margin-top: 20px;
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.btn-correcao {
+    background-color: orange;
+    color: #000;
+}
+
+.btn-reiniciar {
+    background-color: #007bff;
+    color: white;
+}
+
+/* TELA DE RESULTADO */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+#resultado-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 300px;
+}
+
+#resultado-box h2 {
+    margin-bottom: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Classificando Tipos de Dados</h1>
+<p>Arraste cada item para a caixa correta.</p>
+
+<!-- ITENS -->
+<div id="itens">
+    <!-- números -->
+    <div class="item numero" draggable="true" id="i1" data-tipo="numero">12</div>
+    <div class="item numero" draggable="true" id="i2" data-tipo="numero">30</div>
+    <div class="item numero" draggable="true" id="i3" data-tipo="numero">7</div>
+    <div class="item numero" draggable="true" id="i4" data-tipo="numero">100</div>
+    <div class="item numero" draggable="true" id="i5" data-tipo="numero">45</div>
+
+    <!-- decimais -->
+    <div class="item decimal" draggable="true" id="i6" data-tipo="decimal">1,5</div>
+    <div class="item decimal" draggable="true" id="i7" data-tipo="decimal">2,75</div>
+    <div class="item decimal" draggable="true" id="i8" data-tipo="decimal">0,8</div>
+    <div class="item decimal" draggable="true" id="i9" data-tipo="decimal">10,25</div>
+    <div class="item decimal" draggable="true" id="i10" data-tipo="decimal">3,14</div>
+
+    <!-- textos -->
+    <div class="item texto" draggable="true" id="i11" data-tipo="texto">Ana</div>
+    <div class="item texto" draggable="true" id="i12" data-tipo="texto">João</div>
+    <div class="item texto" draggable="true" id="i13" data-tipo="texto">Brasil</div>
+    <div class="item texto" draggable="true" id="i14" data-tipo="texto">Escola</div>
+    <div class="item texto" draggable="true" id="i15" data-tipo="texto">Computador</div>
+    <div class="item texto" draggable="true" id="i16" data-tipo="texto">Aluno</div>
+    <div class="item texto" draggable="true" id="i17" data-tipo="texto">Professor</div>
+    <div class="item texto" draggable="true" id="i18" data-tipo="texto">Cidade</div>
+    <div class="item texto" draggable="true" id="i19" data-tipo="texto">Turma</div>
+    <div class="item texto" draggable="true" id="i20" data-tipo="texto">Matemática</div>
+</div>
+
+<!-- CAIXAS -->
+<div class="container">
+    <div class="caixa" id="numero" ondragover="permitir(event)" ondrop="soltar(event)">
+        <h2>Número</h2>
+    </div>
+    <div class="caixa" id="decimal" ondragover="permitir(event)" ondrop="soltar(event)">
+        <h2>Número decimal</h2>
+    </div>
+    <div class="caixa" id="texto" ondragover="permitir(event)" ondrop="soltar(event)">
+        <h2>Texto</h2>
+    </div>
+</div>
+
+<!-- BOTÕES -->
+<div class="botoes">
+    <button class="btn-correcao" onclick="corrigir()">CORREÇÃO</button>
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay">
+    <div id="resultado-box">
+        <h2>Resultado</h2>
+        <p id="mensagem"></p>
+        <button class="btn-reiniciar" onclick="reiniciar()">REINICIAR</button>
+    </div>
+</div>
+
+<script>
+const itensContainer = document.getElementById("itens");
+const estadoInicial = itensContainer.innerHTML;
+
+// embaralhar
+function embaralhar() {
+    [...itensContainer.children]
+        .sort(() => Math.random() - 0.5)
+        .forEach(i => itensContainer.appendChild(i));
+}
+
+// drag
+function ativarDrag() {
+    document.querySelectorAll(".item").forEach(item => {
+        item.addEventListener("dragstart", ev => {
+            ev.dataTransfer.setData("text", ev.target.id);
+        });
+    });
+}
+
+function permitir(ev) {
+    ev.preventDefault();
+}
+
+function soltar(ev) {
+    ev.preventDefault();
+    const id = ev.dataTransfer.getData("text");
+    ev.currentTarget.appendChild(document.getElementById(id));
+}
+
+// corrigir
+function corrigir() {
+    let acertos = 0;
+    const total = document.querySelectorAll(".item").length;
+
+    document.querySelectorAll(".item").forEach(item => {
+        if (item.dataset.tipo === item.parentElement.id) {
+            acertos++;
+        }
+    });
+
+    document.getElementById("mensagem").textContent =
+        `Você acertou ${acertos} de ${total} itens.`;
+
+    document.getElementById("overlay").style.display = "flex";
+}
+
+// reiniciar
+function reiniciar() {
+    document.getElementById("overlay").style.display = "none";
+
+    document.getElementById("numero").innerHTML = "<h2>Número</h2>";
+    document.getElementById("decimal").innerHTML = "<h2>Número decimal</h2>";
+    document.getElementById("texto").innerHTML = "<h2>Texto</h2>";
+
+    itensContainer.innerHTML = estadoInicial;
+    embaralhar();
+    ativarDrag();
+}
+
+// iniciar
+embaralhar();
+ativarDrag();
+</script>
+
+</body>
+</html>
